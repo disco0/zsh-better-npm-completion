@@ -27,10 +27,11 @@ _zbnc_recursively_look_for() {
 _zbnc_get_package_json_property_object() {
   local package_json="$1"
   local property="$2"
+  # TODO Handle first level of indent for tab, {2,4} spaces
   cat "$package_json" |
-    sed -nE "/^  \"$property\": \{$/,/^  \},?$/p" | # Grab scripts object
-    sed '1d;$d' |                                   # Remove first/last lines
-    sed -E 's/    "([^"]+)": "(.+)",?/\1=>\2/'      # Parse into key=>value
+    sed -nE "/^  \"$property\": \{$/,/^  \},?$/p" |                         # Grab scripts object
+    sed '1d;$d' |                                                           # Remove first/last lines
+    sed  -E -e 's/[ ]*["](([^"]+|]["[\\])+)["][:][ ]*["]([^"]+)",?/\1=>\3/' # Parse into key=>value
 }
 
 _zbnc_get_package_json_property_object_keys() {
